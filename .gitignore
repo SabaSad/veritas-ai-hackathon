@@ -1,0 +1,28 @@
+# Virtual environment
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Secrets / environment variables
+.env
+*.key
+*.pem
+secrets.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data
+# Raw/downloaded data is not tracked (can be large and/or not ours to redistribute).
+# data/sample/ and figures/ are NOT ignored on purpose -- small files that are safe to commit.
+data/raw/
+
+# Large CSVs anywhere in the repo: GitHub flags files over 50MB and blocks files over 100MB,
+# so treat anything near that as "too big to commit" and keep it out of git.
+# (No blanket *.csv ignore here, since data/sample/*.csv should stay tracked.)
