@@ -62,3 +62,13 @@ Datasets, pretrained models, tutorials and AI tools used, with links.
    ```
    jupyter notebook notebooks/
    ```
+
+## Pre-registered plan (written before any results)
+
+- **Question:** if a strategy beat the S&P 500 ETF (SPY) in the past, will it keep beating it on new data, or was it luck?
+- **Split rule:** real data is split by time (train up to about 2020, test 2021 to 2026). Simulated markets are split by whole market, never by single days.
+- **Baselines:** (1) trust the backtest, assume a past winner keeps winning; (2) always predict the most common outcome.
+- **Hypotheses:**
+  - H1: ...
+  - H2: ...
+  - H3: ...

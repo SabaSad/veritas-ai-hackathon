@@ -26,3 +26,7 @@ data/raw/
 # Large CSVs anywhere in the repo: GitHub flags files over 50MB and blocks files over 100MB,
 # so treat anything near that as "too big to commit" and keep it out of git.
 # (No blanket *.csv ignore here, since data/sample/*.csv should stay tracked.)
+
+# Project data rules (added)
+data/processed/
+*.csv
