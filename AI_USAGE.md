@@ -16,3 +16,4 @@ Track every time you use an AI tool (Claude Code, ChatGPT, GitHub Copilot, etc.)
 | 2026-11-15 | Claude Code: wrote src/app.py (local Gradio demo 'Strategy Reality Check') and added gradio to requirements.txt | Run and checked by me: TO CONFIRM |
 | 2026-11-15 | Claude Code: improved src/app.py (dropdown of the 11 real historical windows from rolling_real.py, 'best of all 20' button that fills L, top-k and K=20, matches-found count) | Run and checked by me: TO CONFIRM |
 | 2026-11-15 | Claude Code: small changes to src/app.py (note under the Historical window dropdown about months the simulation also reshuffled; reworded the verdict line) | Run and checked by me: TO CONFIRM |
+| 2026-11-15 | Claude Code: wrote notebooks/Strategy_Reality_Check.ipynb (runs the scripts in order on Colab or locally, shows the figures, limitations section, launches the Gradio demo) | Run and checked by me: TO CONFIRM |
