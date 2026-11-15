@@ -70,7 +70,9 @@ plt.figure(figsize=(6, 5))
 x, y = w20["avg_past_excess"] * 100, w20["avg_new_excess"] * 100
 plt.scatter(x, y)
 for (_, r), xi, yi in zip(w20.iterrows(), x, y):
-    plt.annotate(r["end"][:4], (xi, yi), fontsize=7, xytext=(3, 3), textcoords="offset points")  # window end year
+    # Label = window end year. 2023, 2024 and 2025 sit almost on top of each other, so push them apart.
+    offset = {"2023": (6, -10), "2024": (-6, 8), "2025": (-30, -12)}.get(r["end"][:4], (3, 3))
+    plt.annotate(r["end"][:4], (xi, yi), fontsize=7, xytext=offset, textcoords="offset points")
 lim = [min(x.min(), y.min()), max(x.max(), y.max())]
 plt.plot(lim, lim, "k--", label="45-degree line (new = past)")
 plt.xlabel("K=20 winner: past excess vs SPY (% per year)")

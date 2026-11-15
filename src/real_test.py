@@ -81,7 +81,10 @@ plt.figure(figsize=(6, 5))
 plt.scatter(tab["past_excess"] * 100, tab["new_excess"] * 100, label="20 strategies")
 lim = np.array([tab[["past_excess", "new_excess"]].min().min(), tab[["past_excess", "new_excess"]].max().max()]) * 100
 plt.plot(lim, lim, "k--", label="'Trust the backtest' (new = past)")
-plt.axhline(sim_avg * 100, color="red", label=f"Simulated average ({sim_avg:.2%})")
+plt.axhline(sim_avg * 100, color="red", label=f"Average in simulated markets ({sim_avg:.2%})")
+w20 = tab.loc[tab["past_excess"].idxmax()]   # the K=20 winner = best past excess of all 20
+plt.annotate(f"K=20 winner (L={int(w20.L)}, top_k={int(w20.top_k)})", (w20.past_excess * 100, w20.new_excess * 100),
+             xytext=(12, -22), textcoords="offset points", fontsize=8, arrowprops=dict(arrowstyle="-", color="gray"))
 plt.xlabel("Past excess vs SPY, 2011-2020 (% per year)")
 plt.ylabel("New-data excess vs SPY, 2021-2025 (% per year)")
 plt.title("Real data: past vs new excess return")

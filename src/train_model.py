@@ -86,8 +86,10 @@ print((calib * 100).round(2).astype(str) + "%")
 # 8. Simple chart: a perfectly calibrated method would lie on the 'actual' line.
 plt.figure(figsize=(7, 4))
 for col in calib.columns:
+    label = {"Baseline 1": "Trust the backtest", "Baseline 2": "Always the average"}.get(col, col)
     plt.plot(calib.index.astype(int), calib[col] * 100, marker="o", lw=3 if col == "actual" else 1.5,
-             color="black" if col == "actual" else None, label=col)
+             color="black" if col == "actual" else None, label=label)
+plt.xticks([1, 2, 3, 4, 5])   # whole-number bins only
 plt.xlabel("Bin of past excess return (1 = lowest, 5 = highest)")
 plt.ylabel("Average new-data excess return (%)")
 plt.title("Predicted vs actual new-data excess, test set")
