@@ -54,7 +54,7 @@ The more strategies tried, the better the winner looks in the past, but the new-
 - Yahoo may revise adjusted prices, so re-runs can differ slightly.
 
 ## Credits and AI use
-Data: daily prices downloaded with [yfinance](https://github.com/ranaroussi/yfinance) from [Yahoo Finance](https://finance.yahoo.com). Libraries: pandas, numpy, scikit-learn, matplotlib, Gradio. AI tools: Claude (planning and explanations) and Claude Code (helped write code); every use is logged in AI_USAGE.md in the repository, and I can explain each part.
+Data: daily prices downloaded with [yfinance](https://github.com/ranaroussi/yfinance) from [Yahoo Finance](https://finance.yahoo.com). Libraries: pandas, numpy, scikit-learn, matplotlib, Gradio. AI tools: Claude (planning and explanations) and Claude Code (helped write code). I can explain each part.
 
 *This project is a prototype and is not financial advice.*
 
