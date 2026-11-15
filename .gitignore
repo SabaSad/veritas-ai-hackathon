@@ -30,3 +30,4 @@ data/raw/
 # Project data rules (added)
 data/processed/
 *.csv
+!results/*.csv
