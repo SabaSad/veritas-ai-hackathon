@@ -5,11 +5,11 @@ import pandas as pd
 SECTORS = ["XLB", "XLE", "XLF", "XLI", "XLK", "XLP", "XLU", "XLV", "XLY"]
 
 
-def top3_weights(past_returns):
-    """Given each ETF's past return, give weight 1/3 to the 3 best ETFs, 0 to the rest.
+def top_k_weights(past_returns, k=3):
+    """Given each ETF's past return, give weight 1/k to the k best ETFs, 0 to the rest.
     Rows with no past return yet (NaN) stay NaN, meaning 'no decision possible'."""
-    best = past_returns.rank(axis=1, ascending=False) <= 3
-    w = best.astype(float) / 3
+    best = past_returns.rank(axis=1, ascending=False) <= k
+    w = best.astype(float) / k
     return w.where(past_returns.notna().any(axis=1))  # NaN where nothing was known
 
 
@@ -17,22 +17,23 @@ def top3_weights(past_returns):
 # returns the weights it WANTS to hold after that month. It only sees returns up to that
 # month (rolling windows look backwards), so it works the same on real or simulated data.
 
-def past_12m(ret):
-    """Return over the last 12 months = the 12 monthly returns compounded together."""
-    return (1 + ret).rolling(12).apply(np.prod, raw=True) - 1
+def past_return(ret, L=12):
+    """Return over the last L months = the L monthly returns compounded together.
+    Compounding is done as exp(sum of log(1+r)) - 1, which is fast and looks only backwards."""
+    return np.exp(np.log1p(ret).rolling(L).sum()) - 1
 
 
 def strategy_a(ret):
     """A. Last year's winners: each December, pick the 3 best calendar-year performers."""
-    year_ret = past_12m(ret)
+    year_ret = past_return(ret, 12)
     year_ret = year_ret[year_ret.index.month == 12]    # decide only at the end of December
-    w = top3_weights(year_ret)
+    w = top_k_weights(year_ret)
     return w.reindex(ret.index).ffill()                # keep the same picks all year
 
 
 def strategy_b(ret):
     """B. 12-month momentum: each month, pick the 3 best trailing-12-month performers."""
-    return top3_weights(past_12m(ret))
+    return top_k_weights(past_return(ret, 12))
 
 
 def strategy_c(ret):
