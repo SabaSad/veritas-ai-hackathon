@@ -13,40 +13,47 @@ def top3_weights(past_returns):
     return w.where(past_returns.notna().any(axis=1))  # NaN where nothing was known
 
 
-# Each strategy looks at MONTH-END prices and returns the weights it WANTS to hold
-# after that month-end. It only sees prices up to that date (pct_change looks backwards).
+# Each strategy looks at MONTHLY RETURNS (one row per month, one column per asset) and
+# returns the weights it WANTS to hold after that month. It only sees returns up to that
+# month (rolling windows look backwards), so it works the same on real or simulated data.
 
-def strategy_a(m):
+def past_12m(ret):
+    """Return over the last 12 months = the 12 monthly returns compounded together."""
+    return (1 + ret).rolling(12).apply(np.prod, raw=True) - 1
+
+
+def strategy_a(ret):
     """A. Last year's winners: each December, pick the 3 best calendar-year performers."""
-    year_ret = m[SECTORS].pct_change(12)               # return over the last 12 months
+    year_ret = past_12m(ret)
     year_ret = year_ret[year_ret.index.month == 12]    # decide only at the end of December
     w = top3_weights(year_ret)
-    return w.reindex(m.index).ffill()                  # keep the same picks all year
+    return w.reindex(ret.index).ffill()                # keep the same picks all year
 
 
-def strategy_b(m):
-    """B. 12-month momentum: each month-end, pick the 3 best trailing-12-month performers."""
-    return top3_weights(m[SECTORS].pct_change(12))
+def strategy_b(ret):
+    """B. 12-month momentum: each month, pick the 3 best trailing-12-month performers."""
+    return top3_weights(past_12m(ret))
 
 
-def strategy_c(m):
-    """C. Equal weight: every month-end, 1/9 in each sector ETF."""
-    return pd.DataFrame(1 / len(SECTORS), index=m.index, columns=SECTORS)
+def strategy_c(ret):
+    """C. Equal weight: every month, the same weight in every asset."""
+    return pd.DataFrame(1 / ret.shape[1], index=ret.index, columns=ret.columns)
 
 
-def backtest(prices, strategy):
-    """Take daily prices and a strategy function; return the strategy's monthly returns."""
-    # Collapse daily prices to the last trading day of each month.
-    m = prices.resample("ME").last()
-    # What each ETF returned during each month (this month's price vs last month's).
-    month_ret = m.pct_change()
+def monthly_returns(prices):
+    """Turn daily prices into monthly returns (last trading day of each month)."""
+    return prices.resample("ME").last().pct_change()
+
+
+def backtest(ret, strategy):
+    """Take monthly returns of the assets and a strategy function; return the strategy's monthly returns."""
     # Weights chosen at the END of a month...
-    w = strategy(m)
+    w = strategy(ret)
     # ...can only earn money in the NEXT month. shift(1) moves them forward one month,
     # so the return of month t is always multiplied by weights decided at the end of t-1.
     w = w.shift(1)
-    # Portfolio return = sum of (weight x ETF return); NaN until the strategy can trade.
-    return (w * month_ret[SECTORS]).sum(axis=1, min_count=1).dropna()
+    # Portfolio return = sum of (weight x asset return); NaN until the strategy can trade.
+    return (w * ret).sum(axis=1, min_count=1).dropna()
 
 
 def stats(r):
@@ -60,12 +67,15 @@ def stats(r):
 if __name__ == "__main__":
     prices = pd.read_csv("data/processed/prices.csv", index_col=0, parse_dates=True)
 
-    # Benchmark: buy and hold SPY = just SPY's own monthly returns.
-    spy = prices["SPY"].resample("ME").last().pct_change().dropna()
+    # Daily prices -> monthly returns. SPY is the benchmark (buy and hold = its own returns);
+    # the 9 sector ETFs are what the strategies trade.
+    ret = monthly_returns(prices)
+    spy = ret["SPY"].dropna()
+    ret = ret[SECTORS]
     strategies = {"A Last year's winners": strategy_a,
                   "B 12m momentum": strategy_b,
                   "C Equal weight": strategy_c}
-    results = {name: backtest(prices, f) for name, f in strategies.items()}
+    results = {name: backtest(ret, f) for name, f in strategies.items()}
 
     periods = {"2000-2026": ("2000-01-01", "2026-12-31"),
                "2000-2020": ("2000-01-01", "2020-12-31"),
